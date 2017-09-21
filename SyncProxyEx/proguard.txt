@@ -1,0 +1,6 @@
+-keep class com.smartdevicelink.transport.**{ ;}
+-keep class com.smartdevicelink.exception.**{ ;}
+-keep class com.smartdevicelink.proxy.**{ ;}
+-keep class com.smartdevicelink.proxy.callbacks.**{ ;}
+-keep class com.smartdevicelink.proxy.rpc.**{ ;}
+-keep class com.smartdevicelink.proxy.ex.**{ ;}

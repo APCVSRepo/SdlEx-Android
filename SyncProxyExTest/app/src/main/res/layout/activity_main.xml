@@ -1,0 +1,67 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                xmlns:tools="http://schemas.android.com/tools"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                tools:context="${relativePackage}.${activityClass}">
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="ShowAppIcon"
+        android:id="@+id/btn_app_icon"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"/>
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="PerformInteraction With Graphic"
+        android:id="@+id/btn_perform_interaction"
+        android:layout_below="@+id/btn_app_icon"
+        android:layout_centerHorizontal="true"/>
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="MediaApp-Music"
+        android:id="@+id/btn_media_music"
+        android:layout_below="@+id/btn_perform_interaction"
+        android:layout_centerHorizontal="true"/>
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="NonMediaApp-Message"
+        android:id="@+id/btn_non_media_msg"
+        android:layout_below="@+id/btn_media_music"
+        android:layout_centerHorizontal="true"/>
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="NonMediaApp-Navigation"
+        android:id="@+id/btn_non_media_navi"
+        android:layout_below="@+id/btn_non_media_msg"
+        android:layout_centerHorizontal="true"/>
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Dida Texi"
+        android:id="@+id/btn_dida_texi"
+        android:layout_below="@+id/btn_non_media_navi"
+        android:layout_centerHorizontal="true"/>
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@+id/btn_dida_texi"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_marginLeft="89dp"
+        android:layout_marginStart="89dp"
+        android:layout_marginTop="49dp">
+    </FrameLayout>
+
+
+</RelativeLayout>

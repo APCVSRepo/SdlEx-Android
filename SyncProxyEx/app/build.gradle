@@ -1,0 +1,53 @@
+apply plugin: 'com.android.library'
+
+android {
+    compileSdkVersion 25
+    buildToolsVersion "25.0.0"
+
+    defaultConfig {
+        minSdkVersion 8
+        targetSdkVersion 22
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            shrinkResources false
+            useProguard false
+            debuggable false
+            jniDebuggable false
+            renderscriptDebuggable false
+            pseudoLocalesEnabled false
+            zipAlignEnabled true
+        }
+    }
+
+    // 忽略lint错误
+    lintOptions {
+        abortOnError false
+    }
+}
+
+repositories {
+    flatDir {
+        dirs 'libs'
+    }
+}
+
+dependencies {
+    compile fileTree(include: ['*.jar'], dir: 'libs')
+    compile 'com.android.support:appcompat-v7:25.0.0'
+    compile (name:'smartdevicelink_4.3.0', ext:'aar')
+}
+
+
+task makeJar(type: Copy) {
+    delete 'build/libs/SdlEx.aar'
+    from('build/outputs/aar/')
+    into('build/libs/')
+    include('app-release.aar')
+    rename ('app-release.aar', 'SdlEx.aar')
+}
+
+makeJar.dependsOn(build)
+
