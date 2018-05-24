@@ -12,6 +12,7 @@ import android.os.IBinder;
 import android.util.Log;
 
 import com.smartdevicelink.exception.SdlException;
+import com.smartdevicelink.proxy.LockScreenManager;
 import com.smartdevicelink.proxy.callbacks.OnServiceEnded;
 import com.smartdevicelink.proxy.callbacks.OnServiceNACKed;
 import com.smartdevicelink.proxy.ex.IProxyListenerALMEx;
@@ -947,6 +948,7 @@ public class SdlService extends Service implements IProxyListenerALMEx
 	@Override
 	public void onOnButtonEvent(OnButtonEvent onButtonEvent)
 	{
+
 	}
 
 	@Override
