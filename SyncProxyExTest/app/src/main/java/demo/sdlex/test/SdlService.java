@@ -12,7 +12,6 @@ import android.os.IBinder;
 import android.util.Log;
 
 import com.smartdevicelink.exception.SdlException;
-import com.smartdevicelink.proxy.LockScreenManager;
 import com.smartdevicelink.proxy.callbacks.OnServiceEnded;
 import com.smartdevicelink.proxy.callbacks.OnServiceNACKed;
 import com.smartdevicelink.proxy.ex.IProxyListenerALMEx;
@@ -24,6 +23,7 @@ import com.smartdevicelink.proxy.rpc.AddCommandResponse;
 import com.smartdevicelink.proxy.rpc.AddSubMenuResponse;
 import com.smartdevicelink.proxy.rpc.AlertManeuverResponse;
 import com.smartdevicelink.proxy.rpc.AlertResponse;
+import com.smartdevicelink.proxy.rpc.ButtonPressResponse;
 import com.smartdevicelink.proxy.rpc.ChangeRegistrationResponse;
 import com.smartdevicelink.proxy.rpc.Choice;
 import com.smartdevicelink.proxy.rpc.CreateInteractionChoiceSetResponse;
@@ -36,6 +36,8 @@ import com.smartdevicelink.proxy.rpc.DialNumberResponse;
 import com.smartdevicelink.proxy.rpc.EndAudioPassThruResponse;
 import com.smartdevicelink.proxy.rpc.GenericResponse;
 import com.smartdevicelink.proxy.rpc.GetDTCsResponse;
+import com.smartdevicelink.proxy.rpc.GetInteriorVehicleDataResponse;
+import com.smartdevicelink.proxy.rpc.GetSystemCapabilityResponse;
 import com.smartdevicelink.proxy.rpc.GetVehicleDataResponse;
 import com.smartdevicelink.proxy.rpc.GetWayPointsResponse;
 import com.smartdevicelink.proxy.rpc.ListFilesResponse;
@@ -46,6 +48,7 @@ import com.smartdevicelink.proxy.rpc.OnCommand;
 import com.smartdevicelink.proxy.rpc.OnDriverDistraction;
 import com.smartdevicelink.proxy.rpc.OnHMIStatus;
 import com.smartdevicelink.proxy.rpc.OnHashChange;
+import com.smartdevicelink.proxy.rpc.OnInteriorVehicleData;
 import com.smartdevicelink.proxy.rpc.OnKeyboardInput;
 import com.smartdevicelink.proxy.rpc.OnLanguageChange;
 import com.smartdevicelink.proxy.rpc.OnLockScreenStatus;
@@ -62,11 +65,13 @@ import com.smartdevicelink.proxy.rpc.PutFileResponse;
 import com.smartdevicelink.proxy.rpc.ReadDIDResponse;
 import com.smartdevicelink.proxy.rpc.ResetGlobalPropertiesResponse;
 import com.smartdevicelink.proxy.rpc.ScrollableMessageResponse;
+import com.smartdevicelink.proxy.rpc.SendHapticDataResponse;
 import com.smartdevicelink.proxy.rpc.SendLocation;
 import com.smartdevicelink.proxy.rpc.SendLocationResponse;
 import com.smartdevicelink.proxy.rpc.SetAppIconResponse;
 import com.smartdevicelink.proxy.rpc.SetDisplayLayoutResponse;
 import com.smartdevicelink.proxy.rpc.SetGlobalPropertiesResponse;
+import com.smartdevicelink.proxy.rpc.SetInteriorVehicleDataResponse;
 import com.smartdevicelink.proxy.rpc.SetMediaClockTimer;
 import com.smartdevicelink.proxy.rpc.SetMediaClockTimerResponse;
 import com.smartdevicelink.proxy.rpc.ShowConstantTbtResponse;
@@ -91,6 +96,7 @@ import com.smartdevicelink.proxy.rpc.enums.SdlDisconnectedReason;
 import com.smartdevicelink.proxy.rpc.enums.SoftButtonType;
 import com.smartdevicelink.proxy.rpc.enums.SystemAction;
 import com.smartdevicelink.proxy.rpc.enums.UpdateMode;
+import com.smartdevicelink.transport.BTTransportConfig;
 import com.smartdevicelink.transport.BaseTransportConfig;
 import com.smartdevicelink.transport.MultiplexTransportConfig;
 import com.smartdevicelink.transport.TransportConstants;
@@ -100,7 +106,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Vector;
 
-import static android.provider.UserDictionary.Words.APP_ID;
 
 // InteractionChoiceSet Service
 public class SdlService extends Service implements IProxyListenerALMEx
@@ -167,11 +172,14 @@ public class SdlService extends Service implements IProxyListenerALMEx
 		{
 			try
 			{
+				final String APP_ID = "584421907";
+				final String APP_NAME = "SyncProxyTester";
+
 				//BaseTransportConfig btc = new BTTransportConfig();
 				BaseTransportConfig btc = new MultiplexTransportConfig(this, APP_ID,
 																	   MultiplexTransportConfig.FLAG_MULTI_SECURITY_OFF);
 
-				mProxy = new SdlProxyEx(this, "SyncProxyTester", true, "584421907",
+				mProxy = new SdlProxyEx(this, APP_NAME, true, APP_ID,
 										this, R.drawable.ic_launcher, FileType.GRAPHIC_PNG, btc);
 			}
 			catch (SdlException e)
@@ -753,7 +761,45 @@ public class SdlService extends Service implements IProxyListenerALMEx
 		case HMI_FULL:
 			if (status.getFirstRun())
 			{
-
+//				try
+//				{
+//					mProxy.speakEx("一", false, 1);
+//					mProxy.speakEx("二", false, 1);
+//					mProxy.speakEx("三", false, 1);
+//					mProxy.speakEx("四", false, 1);
+//					mProxy.speakEx("五", false, 1);
+//					mProxy.speakEx("六", false, 1);
+//					mProxy.speakEx("七", false, 1);
+//					mProxy.speakEx("八", false, 1);
+//					mProxy.speakEx("九", false, 1);
+//					mProxy.speakEx("零", false, 1);
+//
+//
+//					mProxy.speakEx("一二三四五六七八九零", false, 1);
+//					mProxy.speakEx("听不到我，听不到我，听不到我", true, 1);
+//					mProxy.speakEx("一二三四五六七八九零", false, 1);
+//					mProxy.speakEx("听不到我，听不到我，听不到我", true, 1);
+//					mProxy.speakEx("一二三四五六七八九零", false, 1);
+//					mProxy.speakEx("听不到我，听不到我，听不到我", true, 1);
+//					mProxy.speakEx("一二三四五六七八九零", false, 1);
+//					mProxy.speakEx("听不到我，听不到我，听不到我", true, 1);
+//					mProxy.speakEx("一二三四五六七八九零", false, 1);
+//					mProxy.speakEx("听不到我，听不到我，听不到我", true, 1);
+//					mProxy.speakEx("一二三四五六七八九零", false, 1);
+//					mProxy.speakEx("听不到我，听不到我，听不到我", true, 1);
+//					mProxy.speakEx("一二三四五六七八九零", false, 1);
+//					mProxy.speakEx("听不到我，听不到我，听不到我", true, 1);
+//					mProxy.speakEx("一二三四五六七八九零", false, 1);
+//					mProxy.speakEx("听不到我，听不到我，听不到我", true, 1);
+//					mProxy.speakEx("一二三四五六七八九零", false, 1);
+//					mProxy.speakEx("听不到我，听不到我，听不到我", true, 1);
+//					mProxy.speakEx("一二三四五六七八九零", false, 1);
+//
+//				}
+//				catch (SdlException e)
+//				{
+//					e.printStackTrace();
+//				}
 
 			}
 			break;
@@ -771,8 +817,7 @@ public class SdlService extends Service implements IProxyListenerALMEx
 	@Override
 	public void onProxyClosed(String s, Exception e, SdlDisconnectedReason sdlDisconnectedReason)
 	{
-		int n = 0;
-		n++;
+
 	}
 
 	@Override
@@ -1245,6 +1290,42 @@ public class SdlService extends Service implements IProxyListenerALMEx
 
 	@Override
 	public void onOnWayPointChange(OnWayPointChange onWayPointChange)
+	{
+
+	}
+
+	@Override
+	public void onGetSystemCapabilityResponse(GetSystemCapabilityResponse getSystemCapabilityResponse)
+	{
+
+	}
+
+	@Override
+	public void onGetInteriorVehicleDataResponse(GetInteriorVehicleDataResponse getInteriorVehicleDataResponse)
+	{
+
+	}
+
+	@Override
+	public void onButtonPressResponse(ButtonPressResponse buttonPressResponse)
+	{
+
+	}
+
+	@Override
+	public void onSetInteriorVehicleDataResponse(SetInteriorVehicleDataResponse setInteriorVehicleDataResponse)
+	{
+
+	}
+
+	@Override
+	public void onOnInteriorVehicleData(OnInteriorVehicleData onInteriorVehicleData)
+	{
+
+	}
+
+	@Override
+	public void onSendHapticDataResponse(SendHapticDataResponse sendHapticDataResponse)
 	{
 
 	}

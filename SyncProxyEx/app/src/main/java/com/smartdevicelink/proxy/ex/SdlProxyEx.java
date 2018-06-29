@@ -27,8 +27,26 @@ import java.util.concurrent.ArrayBlockingQueue;
  */
 public class SdlProxyEx extends SdlProxyALM
 {
+	private static final int INTERVAL_TIME_WORD = 250;
+	private static final int INTERVAL_TIME_SENTENCE = 1500;
+	private class SpeakInfo
+	{
+		public String text;
+		public Boolean interrupt;
+		public Integer correlationID;
+
+		SpeakInfo(String text, Boolean interrupt, Integer correlationID)
+		{
+			this.text = text;
+			this.interrupt = interrupt;
+			this.correlationID = correlationID;
+		}
+	}
+
+	private ArrayBlockingQueue<SpeakInfo> mSpeakInfoQ = new ArrayBlockingQueue<>(256);
+
 	private Operator mCurOperator = null;
-	private ArrayBlockingQueue<Operator> mOperatorQ = new ArrayBlockingQueue<Operator>(256);
+	private ArrayBlockingQueue<Operator> mOperatorQ = new ArrayBlockingQueue<>(256);
 
 	private Context mContext = null;
 	private ProxyListenerALMEx mProxyListener = null;
@@ -44,6 +62,7 @@ public class SdlProxyEx extends SdlProxyALM
 		mProxyListener.setParam(this, listener, iconID, iconFileType);
 
 		mUploadFileThread.start();
+		mSpeakThread.start();
 		mContext = context;
 	}
 
@@ -58,7 +77,9 @@ public class SdlProxyEx extends SdlProxyALM
 		mProxyListener.setParam(this, listener, iconPath, iconFileType);
 
 		mUploadFileThread.start();
+		mSpeakThread.start();
 		mContext = context;
+
 	}
 
 
@@ -118,6 +139,39 @@ public class SdlProxyEx extends SdlProxyALM
 		}
 	};
 
+
+	private Thread mSpeakThread = new Thread()
+	{
+		@Override
+		public void run()
+		{
+			super.run();
+
+			while (true)
+			{
+				try
+				{
+					SpeakInfo si = mSpeakInfoQ.take();
+					speak(si.text, si.correlationID);
+
+					int delay = 0;
+					if (!si.interrupt)
+						delay = si.text.length() * INTERVAL_TIME_WORD + INTERVAL_TIME_SENTENCE;
+
+					sleep(delay);
+				}
+				catch (InterruptedException e)
+				{
+					e.printStackTrace();
+					return;
+				}
+				catch (SdlException e)
+				{
+					e.printStackTrace();
+				}
+			}
+		}
+	};
 
 
 	//===============================RPC callback=======================================
@@ -284,5 +338,11 @@ public class SdlProxyEx extends SdlProxyALM
 		return true;
 	}
 
+	public boolean speakEx(String text, Boolean interrupt, Integer correlationID) throws SdlException
+	{
+		SpeakInfo si = new SpeakInfo(text, interrupt, correlationID);
+		mSpeakInfoQ.add(si);
+		return true;
+	}
 
 }

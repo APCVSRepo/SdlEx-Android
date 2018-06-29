@@ -2,7 +2,7 @@ apply plugin: 'com.android.application'
 
 android {
     compileSdkVersion 21
-    buildToolsVersion '25.0.0'
+    buildToolsVersion '27.0.3'
     defaultConfig {
         applicationId "demo.leon.syncproxyextend"
         minSdkVersion 15
@@ -25,10 +25,14 @@ repositories {
     }
 }
 
+
 dependencies {
     compile 'com.android.support:appcompat-v7:21.0.0'
     compile 'com.android.support:support-v4:21.0.0'
-    compile(name: 'SdlEx', ext: 'aar')
-    compile(name: 'smartdevicelink_4.3.0', ext: 'aar')
+    compile('com.smartdevicelink:bson_java_port:1.0.0@aar') {
+        transitive = true
+    }
     compile files('libs/SDLLayoutDida.jar')
+    compile(name: 'sdl_android-4.4', ext: 'aar')
+    compile(name: 'SdlEx', ext: 'aar')
 }
