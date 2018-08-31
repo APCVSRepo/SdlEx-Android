@@ -47,6 +47,7 @@ public class SdlProxyEx extends SdlProxyALM
 
 	private Operator mCurOperator = null;
 	private ArrayBlockingQueue<Operator> mOperatorQ = new ArrayBlockingQueue<>(256);
+	private int mMaxQSize = 0;
 
 	private Context mContext = null;
 	private ProxyListenerALMEx mProxyListener = null;
@@ -79,7 +80,6 @@ public class SdlProxyEx extends SdlProxyALM
 		mUploadFileThread.start();
 		mSpeakThread.start();
 		mContext = context;
-
 	}
 
 
@@ -124,6 +124,8 @@ public class SdlProxyEx extends SdlProxyALM
 					}
 
 					mCurOperator = null;
+					if (mMaxQSize > 0 && mOperatorQ.size() > mMaxQSize)
+						mOperatorQ.clear();
 				}
 				catch (InterruptedException e)
 				{
@@ -219,6 +221,16 @@ public class SdlProxyEx extends SdlProxyALM
 	//		rpc.setSoftButtons(null);
 	//		sendRPCRequest(rpc);
 	//	}
+
+	public void setMaxQSize(int size)
+	{
+		mMaxQSize = size;
+	}
+
+	public int getCurrentQSize()
+	{
+		return mOperatorQ.size();
+	}
 
 	// Support SoftButtonEx
 	public boolean showSoftButton(List<SoftButton> softButtons, int correlationID) throws SdlException
