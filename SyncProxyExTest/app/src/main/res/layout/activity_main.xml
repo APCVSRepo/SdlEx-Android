@@ -63,5 +63,22 @@
         android:layout_marginTop="49dp">
     </FrameLayout>
 
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Next TTS"
+        android:id="@+id/btn_next_tts"
+        android:layout_below="@+id/btn_dida_texi"
+        android:layout_centerHorizontal="true"/>
+
+    <TextView
+        android:id="@+id/tv_tts"
+        android:layout_below="@id/btn_next_tts"
+        android:layout_width="770px"
+        android:layout_height="250px"
+        android:gravity="center"
+        android:textSize="30px"
+        android:text=""/>
+
 
 </RelativeLayout>

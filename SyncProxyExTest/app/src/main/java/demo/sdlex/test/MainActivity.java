@@ -6,10 +6,15 @@ import android.content.ComponentName;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.view.View;
 import android.widget.Button;
+import android.widget.TextView;
+
+import java.io.File;
+import java.io.FileOutputStream;
 
 
 public class MainActivity extends Activity implements View.OnClickListener, DialogInterface.OnClickListener
@@ -20,6 +25,8 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
 	private Button mBtnAppIcon = null;
 	private Button mBtnDidaTexi = null;
 	private Button mBtnPerformInteraction = null;
+	private Button mBtnNextTTS = null;
+	private TextView mTvTTS = null;
 	private SdlService.DemoBinder mDemoBinder = null;
 
 	private AlertDialog.Builder mNonMediaDlgBuilder = null;
@@ -72,6 +79,8 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
 		mBtnAppIcon = (Button)findViewById(R.id.btn_app_icon);
 		mBtnDidaTexi = (Button)findViewById(R.id.btn_dida_texi);
 		mBtnPerformInteraction = (Button)findViewById(R.id.btn_perform_interaction);
+		mBtnNextTTS = (Button)findViewById(R.id.btn_next_tts);
+		mTvTTS = (TextView)findViewById(R.id.tv_tts);
 
 		mBtnMediaMusic.setOnClickListener(this);
 		mBtnNonMediaMsg.setOnClickListener(this);
@@ -79,6 +88,7 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
 		mBtnAppIcon.setOnClickListener(this);
 		mBtnDidaTexi.setOnClickListener(this);
 		mBtnPerformInteraction.setOnClickListener(this);
+		mBtnNextTTS.setOnClickListener(this);
 
 		mNonMediaDlgBuilder = new AlertDialog.Builder(this);
 		mNonMediaDlgBuilder.setTitle("请选择Layout");
@@ -96,6 +106,7 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
 		bindService(intent, mSrvConn, BIND_AUTO_CREATE);
 
 //		SyncProxyService.updateSDLService(this);
+
 	}
 
 	@Override
@@ -147,6 +158,13 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
 				mDemoBinder.DidaTexi();
 				mDlgDida = mDidaDlgBuilder.show();
 			}
+			break;
+		case R.id.btn_next_tts:
+			if (mDemoBinder != null)
+			{
+				mDemoBinder.NextTTS(mTvTTS);
+			}
+			break;
 		default:
 			break;
 		}
@@ -174,6 +192,29 @@ public class MainActivity extends Activity implements View.OnClickListener, Dial
 				default:
 					break;
 				}
+			}
+		}
+	}
+
+	public static void view2Img(View view, String imgPath)
+	{
+		File file = new File(imgPath);
+		if (file.exists())
+			file.delete();
+
+		view.setDrawingCacheEnabled(true);
+		view.buildDrawingCache();
+		Bitmap bmp = view.getDrawingCache();
+		if(bmp != null)
+		{
+			try
+			{
+				FileOutputStream out = new FileOutputStream(imgPath);
+				bmp.compress(Bitmap.CompressFormat.PNG,100, out);
+			}
+			catch(Exception e)
+			{
+				e.printStackTrace();
 			}
 		}
 	}

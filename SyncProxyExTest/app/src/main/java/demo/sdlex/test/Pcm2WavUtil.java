@@ -1,30 +1,16 @@
 package demo.sdlex.test;
 
-public class Pcm2WaveUtil
+public class Pcm2WavUtil
 {
 
-    /**
-     * @param pcmData pcm原始数据
-     * @param numChannels 声道设置, mono = 1, stereo = 2
-     * @param sampleRate 采样频率
-     * @param bitPerSample 单次数据长度, 例如8bits
-     * @return wav数据
-     */
-    public static byte[] pcmToWav(byte[] pcmData, int numChannels, int sampleRate, int bitPerSample) {
-        byte[] wavData = new byte[pcmData.length + 44];
-        byte[] header = wavHeader(pcmData.length, numChannels, sampleRate, bitPerSample);
+    public static byte[] pcmToWav(byte[] pcmData, int pcmDataCount, int numChannels, int sampleRate, int bitPerSample) {
+        byte[] wavData = new byte[pcmDataCount + 44];
+        byte[] header = wavHeader(pcmDataCount, numChannels, sampleRate, bitPerSample);
         System.arraycopy(header, 0, wavData, 0, header.length);
-        System.arraycopy(pcmData, 0, wavData, header.length, pcmData.length);
+        System.arraycopy(pcmData, 0, wavData, header.length, pcmDataCount);
         return wavData;
     }
 
-    /**
-     * @param pcmLen pcm数据长度
-     * @param numChannels 声道设置, mono = 1, stereo = 2
-     * @param sampleRate 采样频率
-     * @param bitPerSample 单次数据长度, 例如8bits
-     * @return wav头部信息
-     */
     public static byte[] wavHeader(int pcmLen, int numChannels, int sampleRate, int bitPerSample) {
         byte[] header = new byte[44];
         // ChunkID, RIFF, 占4bytes

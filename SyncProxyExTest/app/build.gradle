@@ -33,6 +33,6 @@ dependencies {
         transitive = true
     }
     compile files('libs/SDLLayoutDida.jar')
-    compile(name: 'sdl_android-4.4', ext: 'aar')
-    compile(name: 'SdlEx', ext: 'aar')
+    compile(name: 'sdl_android-4.6.2', ext: 'aar')
+    compile(name: 'SdlEx_18090603', ext: 'aar')
 }

@@ -6,10 +6,12 @@ import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothProfile;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Binder;
 import android.os.IBinder;
 import android.util.Log;
+import android.widget.TextView;
 
 import com.smartdevicelink.exception.SdlException;
 import com.smartdevicelink.proxy.callbacks.OnServiceEnded;
@@ -59,9 +61,11 @@ import com.smartdevicelink.proxy.rpc.OnTBTClientState;
 import com.smartdevicelink.proxy.rpc.OnTouchEvent;
 import com.smartdevicelink.proxy.rpc.OnVehicleData;
 import com.smartdevicelink.proxy.rpc.OnWayPointChange;
+import com.smartdevicelink.proxy.rpc.PerformAudioPassThru;
 import com.smartdevicelink.proxy.rpc.PerformAudioPassThruResponse;
 import com.smartdevicelink.proxy.rpc.PerformInteractionResponse;
 import com.smartdevicelink.proxy.rpc.PutFileResponse;
+import com.smartdevicelink.proxy.rpc.ReadDID;
 import com.smartdevicelink.proxy.rpc.ReadDIDResponse;
 import com.smartdevicelink.proxy.rpc.ResetGlobalPropertiesResponse;
 import com.smartdevicelink.proxy.rpc.ScrollableMessageResponse;
@@ -98,13 +102,16 @@ import com.smartdevicelink.proxy.rpc.enums.SystemAction;
 import com.smartdevicelink.proxy.rpc.enums.UpdateMode;
 import com.smartdevicelink.transport.BTTransportConfig;
 import com.smartdevicelink.transport.BaseTransportConfig;
-import com.smartdevicelink.transport.MultiplexTransportConfig;
-import com.smartdevicelink.transport.TransportConstants;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Vector;
+
+import demo.sdlex.test.layout.SdlAQILayout;
+import demo.sdlex.test.layout.SdlAQILayoutCrystal;
 
 
 // InteractionChoiceSet Service
@@ -128,7 +135,20 @@ public class SdlService extends Service implements IProxyListenerALMEx
 	private int mCorrelationID = 0;
 	private boolean mChoiceSetHasCreated = false;
 	private boolean mNavChoiceSetHasCreated = false;
+	private AudioRecorder mRecorder = new AudioRecorder();
 
+	private static final String[] TTS =
+			{
+					"福特 SYNC®3， 全球超过1000万多辆福特车正在使用的车载娱乐通讯系统。具有先进的语言辨别功能和比拟只能手机的操控感受，全新的操作系统主屏，将车主最常用的功能优先呈现： 导航，音频和电话。方便车主轻松查找手机联系人并方便快速搜索地址。技术控们可以在官方网址查询更多SYNC黑科技",
+					"福特计划在10月上旬分别在南京大学和同济大学举办校园宣讲",
+					"愿意效劳",
+					"每人只能申请一个职位。请同学们仔细阅读职位说明，选择感兴趣的职位和城市进行申请",
+					"在线投递简历后，页面上会自动显示投递成功的字样，也可以在51job站内信和51job投递记录中查看。具体在线笔试安排，会在申请人职位申请投递成功后通过邮件通知到申请人",
+					"福特的校园招聘，会根据不同岗位需求与部门安排，分别安排电话面试。还没有收到电话的同学，务必留意接下来的陌生电话，随时做好准备",
+					"不客气。同学们如果还有其他问题请在福特招聘公众号后台留言，我会整理FAQ",
+			};
+	private static final String TTS_IMG_PATH = "/sdcard/tts_screenshot.png";
+	private int mCurTTS = 0;
 
 
 	// start applink if connect to ford vehicle
@@ -175,10 +195,7 @@ public class SdlService extends Service implements IProxyListenerALMEx
 				final String APP_ID = "584421907";
 				final String APP_NAME = "SyncProxyTester";
 
-				//BaseTransportConfig btc = new BTTransportConfig();
-				BaseTransportConfig btc = new MultiplexTransportConfig(this, APP_ID,
-																	   MultiplexTransportConfig.FLAG_MULTI_SECURITY_OFF);
-
+				BaseTransportConfig btc = new BTTransportConfig();
 				mProxy = new SdlProxyEx(this, APP_NAME, true, APP_ID,
 										this, R.drawable.ic_launcher, FileType.GRAPHIC_PNG, btc);
 			}
@@ -218,7 +235,10 @@ public class SdlService extends Service implements IProxyListenerALMEx
 	{
 		public void MediaMusicDemo()
 		{
-			SdlService.this.mediaMusicDemo();
+//			SdlService.this.startAudioPassThru();
+//			SdlService.this.mediaMusicDemo();
+			SdlService.this.startPics();
+
 		}
 
 		public void NonMediaMsgDemo(String layout)
@@ -256,6 +276,8 @@ public class SdlService extends Service implements IProxyListenerALMEx
 		{
 			SdlService.this.didaTexiNavi();
 		}
+
+		public void NextTTS(TextView tv) { SdlService.this.nextTTS(tv);}
 	}
 
 	private void showBase()
@@ -689,6 +711,68 @@ public class SdlService extends Service implements IProxyListenerALMEx
 		}
 	}
 
+	private void startAudioPassThru()
+	{
+		PerformAudioPassThru msgAPT = mRecorder.buildAPT("Say anything to be played back",
+														 "APT Test",
+														 "Say something",
+														 30000,
+														 100);
+		try
+		{
+			mProxy.sendRPCRequest(msgAPT);
+		}
+		catch (SdlException e)
+		{
+			e.printStackTrace();
+		}
+
+	}
+
+	private void startPics()
+	{
+		SdlAQILayout layout = SdlAQILayoutCrystal.getInstance(this);
+		try
+		{
+
+			mProxy.setdisplaylayout("LARGE_GRAPHIC_ONLY", mCorrelationID++);
+
+			for (int i=0; i<8000; i++)
+			{
+				mProxy.showImg(layout.update(i, 0, new SdlAQILayout.WeatherInfo()), FileType.GRAPHIC_PNG, ShowOp.ShowType.IMAGE_MAIN, 0);
+			}
+		}
+		catch (SdlException e)
+		{
+			e.printStackTrace();
+		}
+
+	}
+
+
+	private void nextTTS(TextView tv)
+	{
+		if (mCurTTS >= TTS.length)
+			mCurTTS = 0;
+
+		// View -> Image file
+		tv.setText(TTS[mCurTTS]);
+		MainActivity.view2Img(tv, TTS_IMG_PATH);
+
+		try
+		{
+			mProxy.setdisplaylayout("LARGE_GRAPHIC_ONLY", mCorrelationID++);
+			mProxy.showImg(TTS_IMG_PATH, FileType.GRAPHIC_PNG, ShowOp.ShowType.IMAGE_MAIN, mCorrelationID++);
+			mProxy.speak(TTS[mCurTTS], mCorrelationID++);
+		}
+		catch (SdlException e)
+		{
+			e.printStackTrace();
+		}
+
+		++mCurTTS;
+	}
+
 	public SdlService()
 	{
 	}
@@ -696,8 +780,8 @@ public class SdlService extends Service implements IProxyListenerALMEx
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId)
 	{
-		boolean forced = intent !=null && intent.getBooleanExtra(TransportConstants.FORCE_TRANSPORT_CONNECTED, false);
-		startProxy(forced, intent);
+//		boolean forced = intent !=null && intent.getBooleanExtra(TransportConstants.FORCE_TRANSPORT_CONNECTED, false);
+//		startProxy(forced, intent);
 
 		return START_STICKY;
 	}
@@ -705,6 +789,7 @@ public class SdlService extends Service implements IProxyListenerALMEx
 	@Override
 	public void onCreate()
 	{
+		startProxy(true, null);
 		super.onCreate();
 	}
 
@@ -726,6 +811,8 @@ public class SdlService extends Service implements IProxyListenerALMEx
 	{
 
 	}
+
+
 
 	@Override
 	public void onOnHMIStatus(OnHMIStatus status)
@@ -808,6 +895,7 @@ public class SdlService extends Service implements IProxyListenerALMEx
 		case HMI_BACKGROUND:
 			break;
 		case HMI_NONE:
+//			stopAudioStream();
 			break;
 		default:
 			return;
@@ -1092,21 +1180,23 @@ public class SdlService extends Service implements IProxyListenerALMEx
 	@Override
 	public void onPerformAudioPassThruResponse(PerformAudioPassThruResponse response)
 	{
-
-
-
+		if (response.getSuccess())
+		{
+			mRecorder.stop();
+		}
 	}
 
 	@Override
-	public void onEndAudioPassThruResponse(EndAudioPassThruResponse endAudioPassThruResponse)
+	public void onEndAudioPassThruResponse(EndAudioPassThruResponse response)
 	{
+
 
 	}
 
 	@Override
 	public void onOnAudioPassThru(OnAudioPassThru apt)
 	{
-		//byte[] data = apt.getAPTData();
+		mRecorder.record(apt.getAPTData());
 
 	}
 
