@@ -230,9 +230,9 @@ public class SdlProxyEx extends SdlProxyALM
 		return Operator.getImageList();
 	}
 
-	public void setPersistent(boolean persistent)
+	public void setPersistentMode(boolean persistentMode)
 	{
-		Operator.setPersistent(persistent);
+		Operator.setPersistent(persistentMode);
 	}
 
 	// Support SoftButtonEx
