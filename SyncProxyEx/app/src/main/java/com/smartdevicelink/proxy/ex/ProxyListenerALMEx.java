@@ -152,7 +152,7 @@ public class ProxyListenerALMEx implements IProxyListenerALMEx
 				else
 					mProxy.showAppIcon((Integer)mIcon, mIconFileType, COID_SHOWDEFAULTICON);
 
-				mProxy.listfiles(64201);
+				mProxy.listfiles(COID_LISTIMAGEFILE);
 			}
 			catch (SdlException e)
 			{
