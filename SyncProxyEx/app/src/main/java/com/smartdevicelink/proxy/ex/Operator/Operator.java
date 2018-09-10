@@ -5,6 +5,7 @@ import com.smartdevicelink.proxy.SdlProxyALM;
 import com.smartdevicelink.proxy.ex.Utils;
 
 import java.util.HashSet;
+import java.util.List;
 
 /**
  * Created by leon on 16/9/27.
@@ -17,11 +18,28 @@ public abstract class Operator
 	protected int correlationID;
 	protected Utils.FileInfo fileInfo;
 	protected static HashSet<String> fileSet = new HashSet<>();
+	protected static boolean persistent = false;
 
 	public static void clear()
 	{
 		fileSet.clear();
 	}
+
+	public static void setImageList(List<String> fileName)
+	{
+		fileSet = new HashSet<>(fileName);
+	}
+
+	public static HashSet<String> getImageList()
+	{
+		return fileSet;
+	}
+
+	public static void setPersistent(boolean persistentMode)
+	{
+		persistent = persistentMode;
+	}
+
 
 	protected Operator()
 	{

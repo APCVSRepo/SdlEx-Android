@@ -4,7 +4,6 @@ package com.smartdevicelink.proxy.ex;
 import com.smartdevicelink.exception.SdlException;
 import com.smartdevicelink.proxy.callbacks.OnServiceEnded;
 import com.smartdevicelink.proxy.callbacks.OnServiceNACKed;
-import com.smartdevicelink.proxy.interfaces.IProxyListenerALM;
 import com.smartdevicelink.proxy.rpc.AddCommandResponse;
 import com.smartdevicelink.proxy.rpc.AddSubMenuResponse;
 import com.smartdevicelink.proxy.rpc.AlertManeuverResponse;
@@ -80,6 +79,7 @@ import com.smartdevicelink.proxy.rpc.enums.SdlDisconnectedReason;
 public class ProxyListenerALMEx implements IProxyListenerALMEx
 {
 	private static final int COID_SHOWDEFAULTICON = 64200;
+	private static final int COID_LISTIMAGEFILE = 64201;
 
 	private boolean mFirstRun = false;
 	private HMILevel mLastHmiLevel = HMILevel.HMI_NONE;
@@ -151,6 +151,8 @@ public class ProxyListenerALMEx implements IProxyListenerALMEx
 					mProxy.showAppIcon((String)mIcon, mIconFileType, COID_SHOWDEFAULTICON);
 				else
 					mProxy.showAppIcon((Integer)mIcon, mIconFileType, COID_SHOWDEFAULTICON);
+
+				mProxy.listfiles(64201);
 			}
 			catch (SdlException e)
 			{
@@ -443,6 +445,12 @@ public class ProxyListenerALMEx implements IProxyListenerALMEx
 	@Override
 	public void onListFilesResponse(ListFilesResponse response)
 	{
+		if (response.getCorrelationID() == COID_LISTIMAGEFILE)
+		{
+			mProxy.updateImageList(response.getFilenames());
+			return;
+		}
+
 		if (mForwardListener != null)
 			mForwardListener.onListFilesResponse(response);
 	}

@@ -18,6 +18,7 @@ import com.smartdevicelink.proxy.rpc.enums.Language;
 import com.smartdevicelink.transport.BaseTransportConfig;
 
 import java.io.InputStream;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Vector;
 import java.util.concurrent.ArrayBlockingQueue;
@@ -43,11 +44,10 @@ public class SdlProxyEx extends SdlProxyALM
 		}
 	}
 
-	private ArrayBlockingQueue<SpeakInfo> mSpeakInfoQ = new ArrayBlockingQueue<>(256);
+	private ArrayBlockingQueue<SpeakInfo> mSpeakInfoQ = new ArrayBlockingQueue<>(4096);
 
 	private Operator mCurOperator = null;
-	private ArrayBlockingQueue<Operator> mOperatorQ = new ArrayBlockingQueue<>(256);
-	private int mMaxQSize = 0;
+	private ArrayBlockingQueue<Operator> mOperatorQ = new ArrayBlockingQueue<>(4096);
 
 	private Context mContext = null;
 	private ProxyListenerALMEx mProxyListener = null;
@@ -124,8 +124,6 @@ public class SdlProxyEx extends SdlProxyALM
 					}
 
 					mCurOperator = null;
-					if (mMaxQSize > 0 && mOperatorQ.size() > mMaxQSize)
-						mOperatorQ.clear();
 				}
 				catch (InterruptedException e)
 				{
@@ -200,6 +198,11 @@ public class SdlProxyEx extends SdlProxyALM
 			return correlationID == mCurOperator.getCorrelationID();
 	}
 
+	void updateImageList(List<String> fileName)
+	{
+		Operator.setImageList(fileName);
+	}
+
 	//=======================================INTERFACE=======================================//
 	public static boolean isSdlDevice(String deviceName)
 	{
@@ -222,14 +225,14 @@ public class SdlProxyEx extends SdlProxyALM
 	//		sendRPCRequest(rpc);
 	//	}
 
-	public void setMaxQSize(int size)
+	public HashSet<String> getImageList()
 	{
-		mMaxQSize = size;
+		return Operator.getImageList();
 	}
 
-	public int getCurrentQSize()
+	public void setPersistent(boolean persistent)
 	{
-		return mOperatorQ.size();
+		Operator.setPersistent(persistent);
 	}
 
 	// Support SoftButtonEx

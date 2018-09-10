@@ -67,7 +67,7 @@ public class ShowOp extends SingleOperator
 		}
 		else
 		{
-			proxy.putfile(fileInfo.name, fileInfo.type, false, fileInfo.data, correlationID);
+			proxy.putfile(fileInfo.name, fileInfo.type, persistent, fileInfo.data, correlationID);
 			return false;
 		}
 

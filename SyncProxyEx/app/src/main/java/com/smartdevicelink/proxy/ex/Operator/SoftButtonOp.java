@@ -35,7 +35,7 @@ public class SoftButtonOp extends MultiOperator
 		}
 		else
 		{
-			proxy.putfile(fileInfo.name, fileInfo.type, false, fileInfo.data, correlationID);
+			proxy.putfile(fileInfo.name, fileInfo.type, persistent, fileInfo.data, correlationID);
 			return false;
 		}
 
